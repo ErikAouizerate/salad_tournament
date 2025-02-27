@@ -5,4 +5,4 @@ from badminton.models import Tournament
 class TournamentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tournament
-        fields = ['id', 'name', 'ground_count']
+        fields = "__all__"

@@ -1,7 +1,10 @@
 from .tournament import TournamentSerializer
-from .player import PlayerSerializer
+from .user import UserSerializer
+from .player import PlayerSerializer, PairingsListSerializer
 
 __all__ = [
     'TournamentSerializer',
     'PlayerSerializer',
+    'PairingsListSerializer',
+    'UserSerializer',
 ]
