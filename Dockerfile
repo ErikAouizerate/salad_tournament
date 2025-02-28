@@ -26,12 +26,14 @@ RUN pip install --upgrade pip && pip install "poetry<1.8" && poetry install --no
 
 # Copy project
 COPY . /app/
+
 # Create a non-root user for security
 RUN adduser --disabled-password --gecos '' django_user
 RUN chown -R django_user:django_user /app
 USER django_user
 
 EXPOSE 8000
+
 
 # Run entrypoint script
 ENTRYPOINT ["/app/scripts/entrypoint.sh"]

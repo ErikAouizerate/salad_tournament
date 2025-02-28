@@ -37,7 +37,7 @@ if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_EMAIL" ] && [ 
     poetry run python manage.py createsuperuser --noinput || warning "Superuser may already exist"
 fi
 
-# poetry run python manage.py collectstatic --clear --no-input
+poetry run python manage.py collectstatic --clear --no-input
 
 # Start Gunicorn
 info "Starting application..."

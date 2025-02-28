@@ -31,7 +31,7 @@ class Player(User):
 
         if is_new:
             for player in players:
-                partner = Partner.objects.create(a=player, b=self)
+                partner = Partner.objects.create(a=player, b=self, tournament=self.tournament)
                 partner.save()
 
     class Meta:

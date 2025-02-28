@@ -3,6 +3,7 @@ from django.db import models
 
 class Partner(models.Model):
 
+    tournament = models.ForeignKey('badminton.Tournament', blank=True, on_delete=models.CASCADE)
     a = models.ForeignKey('badminton.Player', blank=True, on_delete=models.CASCADE, related_name='partner_a')
     b = models.ForeignKey('badminton.Player', blank=True, on_delete=models.CASCADE, related_name='partner_b')
     game_count = models.IntegerField(default=0)
