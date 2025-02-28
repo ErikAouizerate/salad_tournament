@@ -60,7 +60,7 @@ class MatchService:
 
         bench = list(Player.objects.exclude(pk__in=players_pk))
 
-        print("not sorted", list(map(lambda x: x.pk, players)))
+        # print("not sorted", list(map(lambda x: x.pk, players)))
 
         # players = sorted(players, key=lambda x: players_order.index(x.pk) if x.pk in players_order else len(players_order))
         # print("playersplayersplayers", list(map(lambda x: x.pk, players)))
@@ -68,7 +68,7 @@ class MatchService:
         players_dict = {player.pk: player for player in players}
 
         average_rank = statistics.mean([player.rank for player in players])
-        print("average_rank", average_rank)
+        # print("average_rank", average_rank)
 
         players_pk = [player.pk for player in players]
         partners = Partner.objects.filter(a__in=players_pk, b__in=players_pk).order_by('game_count')
@@ -78,7 +78,7 @@ class MatchService:
 
         sorted_pairs = sorted(partners, key=lambda e: (e.game_count, abs(average_rank * 2 - e.rank)))
 
-        print("sorted_pairs", sorted_pairs)
+        # print("sorted_pairs", sorted_pairs)
 
         pairing = []
 
@@ -116,6 +116,5 @@ class MatchService:
             match['hasTeamAWon'] = bool(random.getrandbits(1))
         matchup['tournamentId'] = tournament_id
         matchup['results'] = matchup['pairings']
-        print("matchup", matchup)
 
         MatchService.updateResults(matchup)
