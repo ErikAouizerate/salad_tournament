@@ -8,8 +8,6 @@ services:
     volumes:
       - ./data:/app/data
       - static_volume:/app/staticfiles
-    ports:
-      - "8001:8000"
 
   nginx:
     image: nginx:alpine
