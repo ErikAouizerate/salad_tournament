@@ -1,6 +1,7 @@
 from .tournament import TournamentViewSet
 from .player import PlayerViewSet
 from .user import UserViewSet
+from .result import MatchUpView
 from .pairing import PairingView
 
 __all__ = [
@@ -8,4 +9,5 @@ __all__ = [
     'TournamentViewSet',
     'UserViewSet',
     'PairingView',
+    'MatchUpView',
 ]
