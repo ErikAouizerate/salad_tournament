@@ -6,7 +6,7 @@ services:
     environment:
       - DEBUG=true
     volumes:
-      - ./data:/app/data
+      - data_volume:/app/data
       - static_volume:/app/staticfiles
 
   nginx:
@@ -21,3 +21,4 @@ services:
 
 volumes:
   static_volume:
+  data_volume:
