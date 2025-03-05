@@ -27,10 +27,12 @@ services:
       - "8888:8888"
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=traefik-network"
       - "traefik.http.routers.cv.rule=Host(`salad.mintset.net`)"
       - "traefik.http.routers.cv.entrypoints=websecure"
       - "traefik.http.routers.cv.tls.certresolver=letsencrypt"
       - "traefik.http.services.cv.loadbalancer.server.port=8888" # The internal port your app listens on
+      - "traefik.http.services.cv.loadbalancer.server.scheme=http"
 volumes:
   static_volume:
   data_volume:
