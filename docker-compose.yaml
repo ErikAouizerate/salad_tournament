@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
     environment:
       - DEBUG=true
+    expose:
+      - 8000
     volumes:
       - data_volume:/app/data
       - static_volume:/app/staticfiles
