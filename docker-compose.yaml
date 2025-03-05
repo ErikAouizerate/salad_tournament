@@ -6,7 +6,7 @@ services:
     environment:
       - DEBUG=true
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     volumes:
       - data_volume:/app/data
       - static_volume:/app/staticfiles

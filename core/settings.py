@@ -37,7 +37,8 @@ DEBUG = env.bool('DEBUG', default=False)
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'salad.mintset.net']
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8888']
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8888', 'https://salad.mintset.net']
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
