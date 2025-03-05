@@ -1,6 +1,7 @@
 # SETUP
 
 `cp .env.sample .env`
+`cp docker-compose.dev.yaml docker-compose.yaml`
 
 ## supprimer la bdd
 
