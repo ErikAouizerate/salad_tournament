@@ -22,10 +22,10 @@ services:
       - web
     networks:
       - salad
-      - traefik-network # Connect to the Traefik network
+      - traefik-web # Connect to the Traefik network
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=traefik-network"
+      - "traefik.docker.network=traefik-web"
       - "traefik.http.routers.salad.rule=Host(`salad.mintset.net`)"
       - "traefik.http.routers.salad.entrypoints=websecure"
       - "traefik.http.routers.salad.tls.certresolver=letsencrypt"
@@ -38,5 +38,5 @@ volumes:
 networks:
   salad:
     driver: bridge
-  traefik-network:
+  traefik-web:
     external: true
