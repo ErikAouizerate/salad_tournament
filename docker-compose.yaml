@@ -23,6 +23,8 @@ services:
     networks:
       - salad
       - traefik-network # Connect to the Traefik network
+    ports:
+      - "8888:8888"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.cv.rule=Host(`salad.mintset.net`)"
