@@ -23,16 +23,14 @@ services:
     networks:
       - salad
       - traefik-network # Connect to the Traefik network
-    ports:
-      - "8888:8888"
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik-network"
-      - "traefik.http.routers.cv.rule=Host(`salad.mintset.net`)"
-      - "traefik.http.routers.cv.entrypoints=websecure"
-      - "traefik.http.routers.cv.tls.certresolver=letsencrypt"
-      - "traefik.http.services.cv.loadbalancer.server.port=8888" # The internal port your app listens on
-      - "traefik.http.services.cv.loadbalancer.server.scheme=http"
+      - "traefik.http.routers.salad.rule=Host(`salad.mintset.net`)"
+      - "traefik.http.routers.salad.entrypoints=websecure"
+      - "traefik.http.routers.salad.tls.certresolver=letsencrypt"
+      - "traefik.http.services.salad.loadbalancer.server.port=8888" # The internal port your app listens on
+      - "traefik.http.services.salad.loadbalancer.server.scheme=http"
 volumes:
   static_volume:
   data_volume:
