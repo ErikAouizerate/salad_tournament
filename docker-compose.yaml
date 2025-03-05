@@ -5,11 +5,11 @@ services:
       dockerfile: Dockerfile
     environment:
       - DEBUG=true
-    ports:
-      - "8000:8000"
     volumes:
       - data_volume:/app/data
       - static_volume:/app/staticfiles
+    networks:
+      - salad_backend
 
   nginx:
     image: nginx:alpine
@@ -21,12 +21,12 @@ services:
     depends_on:
       - web
     networks:
-      - python
+      - salad_backend
 
 volumes:
   static_volume:
   data_volume:
 
 networks:
-  python:
+  salad_backend:
     driver: bridge
