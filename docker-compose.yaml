@@ -5,8 +5,8 @@ services:
       dockerfile: Dockerfile
     environment:
       - DEBUG=true
-    expose:
-      - 8000
+    ports:
+      - "8000:8000"
     volumes:
       - data_volume:/app/data
       - static_volume:/app/staticfiles
@@ -15,8 +15,6 @@ services:
 
   nginx:
     image: nginx:alpine
-    ports:
-      - "8888:80"
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
       - static_volume:/home/app/web/static
@@ -24,7 +22,13 @@ services:
       - web
     networks:
       - salad
-
+      - traefik-network # Connect to the Traefik network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cv.rule=Host(`salad.mintset.net`)"
+      - "traefik.http.routers.cv.entrypoints=websecure"
+      - "traefik.http.routers.cv.tls.certresolver=letsencrypt"
+      - "traefik.http.services.cv.loadbalancer.server.port=8888" # The internal port your app listens on
 volumes:
   static_volume:
   data_volume:
