@@ -36,3 +36,5 @@ volumes:
 networks:
   salad:
     driver: bridge
+  traefik-network:
+    external: true
