@@ -1,0 +1,33 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DEBUG=true
+    volumes:
+      - data_volume:/app/data
+      - static_volume:/app/staticfiles
+    networks:
+      - salad
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx/:/etc/nginx/conf.d/
+      - static_volume:/home/app/web/static
+    depends_on:
+      - web
+    ports:
+      - "8888:8888"
+    networks:
+      - salad
+
+volumes:
+  static_volume:
+  data_volume:
+
+networks:
+  salad:
+    driver: bridge
+

@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      - DEBUG=true
+      - DEBUG=false
     volumes:
       - data_volume:/app/data
       - static_volume:/app/staticfiles

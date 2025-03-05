@@ -8,6 +8,9 @@ media
 data/*
 !data/.gitkeep
 
+# config
+docker-compose.yaml
+
 # Backup files # 
 *.bak 
 
