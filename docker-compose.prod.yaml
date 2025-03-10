@@ -6,7 +6,7 @@ services:
     environment:
       - DEBUG=false
     volumes:
-      - ./data/:/app/data/
+      - ./data:/app/data:rw,z
       - static_volume:/app/staticfiles
     networks:
       - salad
