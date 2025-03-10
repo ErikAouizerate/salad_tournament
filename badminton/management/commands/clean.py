@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from badminton.models import Tournament, User
+from badminton.models import Tournament, Player
 
 
 class Command(BaseCommand):
@@ -8,5 +8,5 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         # tournament = Tournament.objects.create(name="t1")
 
-        User.objects.all().delete()
+        Player.objects.all().delete()
         Tournament.objects.all().delete()

@@ -10,6 +10,7 @@ class Competitor(Player):
     lost = models.IntegerField(default=0)
     played = models.IntegerField(default=0)
     rank = models.FloatField(default=0)
+    is_playing = models.BooleanField(blank=False, null=False, default=True)
 
     def calculate_rank(self):
         if self.played == 0:
@@ -22,16 +23,22 @@ class Competitor(Player):
         return f"{self.firstname} {self.lastname}"
 
     def save(self, *args, **kwargs):
+        is_competitor = self.__class__ is Competitor
+
         is_new = self.pk is None
-        if is_new:
+        if is_new and is_competitor:
             competitors = list(Competitor.objects.filter(tournament=self.tournament))
 
         self.rank = self.calculate_rank()
         super().save(*args, **kwargs)
 
-        if is_new:
+        if is_new and is_competitor:
             for competitor in competitors:
-                partner = Partner.objects.create(a=competitor, b=self, tournament=self.tournament)
+                if competitor.id < self.id:
+                    partner = Partner.objects.create(a=competitor, b=self, tournament=self.tournament)
+                else:
+                    partner = Partner.objects.create(a=self, b=competitor, tournament=self.tournament)
+
                 partner.save()
 
     class Meta:

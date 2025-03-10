@@ -51,7 +51,7 @@ class MatchService:
 
         # players_order = []
 
-        competitors = list(Competitor.objects.filter(tournament=tounrnament_id).order_by('played')[:tournament.ground_count * 4])
+        competitors = list(Competitor.objects.filter(tournament=tounrnament_id).filter(is_playing=True).order_by('played')[:tournament.ground_count * 4])
 
         if competitors.__len__() % 4 != 0:
             competitors = competitors[:-(competitors.__len__() % 4)]
