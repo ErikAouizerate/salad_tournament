@@ -30,6 +30,7 @@ COPY . /app/
 # Create a non-root user for security
 RUN adduser --disabled-password --gecos '' django_user
 RUN chown -R django_user:django_user /app
+RUN chown -R django_user:django_user /app/data
 USER django_user
 
 EXPOSE 8000
