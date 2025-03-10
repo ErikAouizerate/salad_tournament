@@ -1,5 +1,5 @@
-from badminton.models import Player, Tournament, Partner
-from badminton.serializers import PairingsListSerializer, PlayerSerializer
+from badminton.models import Competitor, Tournament, Partner
+from badminton.serializers import PairingsListSerializer, CompetitorSerializer
 import statistics
 import random
 
@@ -37,12 +37,12 @@ class MatchService:
             partner.save()
 
         for result in results:
-            player = Player.objects.get(pk=result["id"])
-            player.played += 1
-            player.won += 1 if result["has_won"] else 0
-            player.lost += 1 if not result["has_won"] else 0
+            competitor = Competitor.objects.get(pk=result["id"])
+            competitor.played += 1
+            competitor.won += 1 if result["has_won"] else 0
+            competitor.lost += 1 if not result["has_won"] else 0
 
-            player.save()
+            competitor.save()
         return results
 
     @staticmethod
@@ -51,26 +51,26 @@ class MatchService:
 
         # players_order = []
 
-        players = list(Player.objects.filter(tournament=tounrnament_id).order_by('played')[:tournament.ground_count * 4])
+        competitors = list(Competitor.objects.filter(tournament=tounrnament_id).order_by('played')[:tournament.ground_count * 4])
 
-        if players.__len__() % 4 != 0:
-            players = players[:-(players.__len__() % 4)]
+        if competitors.__len__() % 4 != 0:
+            competitors = competitors[:-(competitors.__len__() % 4)]
 
-        players_pk = list(map(lambda x: x.pk, players))
+        players_pk = list(map(lambda x: x.pk, competitors))
 
-        bench = list(Player.objects.exclude(pk__in=players_pk))
+        bench = list(Competitor.objects.exclude(pk__in=players_pk))
 
-        # print("not sorted", list(map(lambda x: x.pk, players)))
+        # print("not sorted", list(map(lambda x: x.pk, competitors)))
 
-        # players = sorted(players, key=lambda x: players_order.index(x.pk) if x.pk in players_order else len(players_order))
-        # print("playersplayersplayers", list(map(lambda x: x.pk, players)))
+        # competitors = sorted(competitors, key=lambda x: players_order.index(x.pk) if x.pk in players_order else len(players_order))
+        # print("playersplayersplayers", list(map(lambda x: x.pk, competitors)))
 
-        players_dict = {player.pk: player for player in players}
+        players_dict = {competitor.pk: competitor for competitor in competitors}
 
-        average_rank = statistics.mean([player.rank for player in players])
+        average_rank = statistics.mean([competitor.rank for competitor in competitors])
         # print("average_rank", average_rank)
 
-        players_pk = [player.pk for player in players]
+        players_pk = [competitor.pk for competitor in competitors]
         partners = Partner.objects.filter(a__in=players_pk, b__in=players_pk).order_by('game_count')
 
         for pair in partners:
@@ -82,17 +82,17 @@ class MatchService:
 
         pairing = []
 
-        for _ in range(round(players.__len__() / 2)):
-            player_A = players.pop()
+        for _ in range(round(competitors.__len__() / 2)):
+            player_A = competitors.pop()
             pair = next(pair for pair in sorted_pairs if pair.a == player_A or pair.b == player_A)
             if pair.a == player_A:
                 player_B = pair.b
             else:
                 player_B = pair.a
 
-            player_B_index = players.index(player_B)
+            player_B_index = competitors.index(player_B)
 
-            player_B = players.pop(player_B_index)
+            player_B = competitors.pop(player_B_index)
             pairing.append({"a": player_A, "b": player_B, "rank": player_A.rank + player_B.rank})
             sorted_pairs = list(filter(lambda p: (p.a != player_A and p.b != player_A) and (p.a != player_B and p.b != player_B), sorted_pairs))
 
@@ -106,7 +106,7 @@ class MatchService:
         # self.updateResults(json.loads(json.dumps(pairings, cls=ModelEncoder)))
 
         pairingsSerialized = PairingsListSerializer(pairings, many=True)
-        benchSerialized = PlayerSerializer(bench, many=True)
+        benchSerialized = CompetitorSerializer(bench, many=True)
 
         return {"pairings": pairingsSerialized.data, "bench": benchSerialized.data}
 

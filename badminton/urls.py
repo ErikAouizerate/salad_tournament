@@ -1,7 +1,7 @@
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from badminton.views import TournamentViewSet, PlayerViewSet, UserViewSet, PairingView, MatchUpView
+from badminton.views import TournamentViewSet, CompetitorViewSet, PlayerViewSet, PairingView, MatchUpView
 
 
 app_name = 'badminton'
@@ -13,8 +13,8 @@ app_name = 'badminton'
 
 router = DefaultRouter()
 router.register(r'tournaments', TournamentViewSet)
-router.register(r'users', UserViewSet)
 router.register(r'players', PlayerViewSet)
+router.register(r'competitors', CompetitorViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
