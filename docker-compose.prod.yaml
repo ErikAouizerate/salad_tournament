@@ -6,7 +6,7 @@ services:
     environment:
       - DEBUG=false
     volumes:
-      - ./data:/app/data:rw,z
+      - data_volume:/app/data
       - static_volume:/app/staticfiles
     networks:
       - salad
@@ -31,6 +31,7 @@ services:
       - "traefik.http.services.salad.loadbalancer.server.scheme=http"
 volumes:
   static_volume:
+  data_volume:
 
 networks:
   salad:
