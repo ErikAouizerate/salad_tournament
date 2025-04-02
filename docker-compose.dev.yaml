@@ -4,10 +4,29 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      - DEBUG=true
+      - DEBUG=${DEBUG}
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=db
+      - DB_PORT=5432
     volumes:
-      - ./data:/app/data:rw,z
       - static_volume:/app/staticfiles
+    networks:
+      - salad
+    depends_on:
+      - db
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - salad
 
@@ -25,6 +44,7 @@ services:
 
 volumes:
   static_volume:
+  postgres_data:
 
 networks:
   salad:
