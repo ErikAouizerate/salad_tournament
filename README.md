@@ -28,6 +28,7 @@ puis aller sur : http://localhost:8888/swagger/
 
 ## api resume
 
+GET : http://localhost:8000/badminton/api/competitors/?tournament=8
 GET : http://localhost:8000/badminton/api/tournaments/3/nextRound?random=true&toFinish=true
 GET : http://localhost:8000/badminton/api/tournaments/3/missingRounds/
 
@@ -99,3 +100,7 @@ POST : http://localhost:8000/badminton/api/tournaments/3/saveRound/
   "toFinish": false
 }
 ```
+
+## QUESTION
+
+ajout d'un competitor

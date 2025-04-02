@@ -2,7 +2,8 @@ from badminton.models import Competitor, Partner
 import statistics
 import random
 import math
-from django.db.models import Max
+from django.db.models import Window, Max
+from django.db.models.functions import RowNumber, Random
 
 
 class TournamentService:
@@ -55,7 +56,20 @@ class TournamentService:
 
         # players_order = []
 
-        competitors = list(Competitor.objects.filter(tournament=self.tournament).filter(is_playing=True).order_by('played')[:self.tournament.ground_count * 4])
+        competitors = list(
+            Competitor.objects.filter(tournament=self.tournament)
+            .filter(is_playing=True)
+            .annotate(
+                # First create a random grouping
+                random_group=Window(
+                    expression=RowNumber(),
+                    order_by=Random()
+                )
+            )
+            # Then order by 'played' within those random groups
+            .order_by('played', 'random_group')
+            [:self.tournament.ground_count * 4]
+        )
 
         if competitors.__len__() % 4 != 0:
             competitors = competitors[:-(competitors.__len__() % 4)]
@@ -103,7 +117,8 @@ class TournamentService:
         pairings = []
 
         for index in range(0, sorted_pairing.__len__(), 2):
-            pairings.append({'teamA': sorted_pairing[index], 'teamB': sorted_pairing[index + 1]})
+            pairings.append({'teamA': sorted_pairing[index], 'teamB': sorted_pairing[index + 1],
+                            'rankDelta': sorted_pairing[index]["rank"] - sorted_pairing[index + 1]["rank"]})
 
         # self.updateResults(json.loads(json.dumps(pairings, cls=ModelEncoder)))
         missing_rounds = self.get_missing_next_rounds(pairings)

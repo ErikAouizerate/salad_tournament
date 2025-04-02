@@ -21,7 +21,7 @@ if [ -n "$DATABASE_URL" ] || [ -n "$DB_HOST" ]; then
     DB_PORT=${DB_PORT:-5432}
     
     info "Waiting for database at $DB_HOST:$DB_PORT..."
-    /app/scripts/wait-for.sh $DB_HOST:$DB_PORT -t 6660
+    /app/scripts/wait-for.sh $DB_HOST:$DB_PORT -t 60
     info "Database is up!"
 fi
 

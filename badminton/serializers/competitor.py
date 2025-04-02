@@ -1,8 +1,16 @@
 from rest_framework import serializers
-from badminton.models import Competitor
+from badminton.models import Competitor, Player
+
+
+class PlayerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Player
+        fields = ['id', 'firstname', 'lastname', 'level', 'gender']
 
 
 class CompetitorSerializer(serializers.ModelSerializer):
+    player = PlayerSerializer(read_only=True)
+
     class Meta:
         model = Competitor
         fields = "__all__"
@@ -33,5 +41,6 @@ class PairingsListSerializer(serializers.Serializer):
             'teamB': [
                 CompetitorSerializer(instance['teamB']['a']).data,
                 CompetitorSerializer(instance['teamB']['b']).data
-            ]
+            ],
+            'rankDelta': instance["rankDelta"]
         }
