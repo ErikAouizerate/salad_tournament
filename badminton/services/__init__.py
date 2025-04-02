@@ -1,5 +1,5 @@
-from .match_service import MatchService
+from .tournament_service import TournamentService
 
 __all__ = [
-    'MatchService',
+    'TournamentService',
 ]
