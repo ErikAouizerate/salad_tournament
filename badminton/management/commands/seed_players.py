@@ -9,7 +9,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         try:
             with transaction.atomic():
-                tournament = Tournament.objects.create(name="t1", ground_count=2)
+                tournament = Tournament.objects.create(name="t1", ground_count=3)
 
                 players_data = [
                     {
@@ -89,15 +89,29 @@ class Command(BaseCommand):
                         'firstname': 'competitor',
                         'lastname': 'r',
                         'tournament': tournament,
+                        'level': 2,
+                        'gender': 'F'
+                    },
+                    {
+                        'firstname': 'competitor',
+                        'lastname': 'r',
+                        'tournament': tournament,
                         'level': 4,
-                        'gender': 'M'
+                        'gender': 'F'
+                    },
+                    {
+                        'firstname': 'competitor',
+                        'lastname': 'r',
+                        'tournament': tournament,
+                        'level': 4,
+                        'gender': 'F'
                     },
                     {
                         'firstname': 'competitor',
                         'lastname': 'r',
                         'tournament': tournament,
                         'level': 6,
-                        'gender': 'M'
+                        'gender': 'F'
                     },
                     {
                         'firstname': 'competitor',
@@ -111,6 +125,20 @@ class Command(BaseCommand):
                         'lastname': 'r',
                         'tournament': tournament,
                         'level': 4,
+                        'gender': 'M'
+                    },
+                    {
+                        'firstname': 'competitor',
+                        'lastname': 'r',
+                        'tournament': tournament,
+                        'level': 6,
+                        'gender': 'F'
+                    },
+                    {
+                        'firstname': 'competitor',
+                        'lastname': 'r',
+                        'tournament': tournament,
+                        'level': 2,
                         'gender': 'M'
                     },
                     {
@@ -157,55 +185,6 @@ class Command(BaseCommand):
                     },
                 ]
 
-                for player_data in players_data:
-                    player, created = Player.objects.get_or_create(
-                        firstname=player_data['firstname'],
-                        defaults=player_data
-                    )
-                    if created:
-                        self.stdout.write(
-                            self.style.SUCCESS(
-                                f'Successfully created player "{player.firstname}"')
-                        )
-                    else:
-                        self.stdout.write(
-                            self.style.WARNING(
-                                f'Player "{player.firstname}" already exists')
-                        )
-
-                competitors_data = [
-                    {
-                        'firstname': 'competitor yy',
-                        'lastname': 'r',
-                        'tournament': tournament,
-                        'level': 2,
-                        'gender': 'F'
-                    },
-                    {
-                        'firstname': 'competitor zz',
-                        'lastname': 'r',
-                        'tournament': tournament,
-                        'level': 4,
-                        'gender': 'F'
-                    },
-                ]
-
-                for competitor_data in competitors_data:
-                    competitor, created = Competitor.objects.get_or_create(
-                        firstname=competitor_data["firstname"],
-                        defaults=competitor_data
-                    )
-
-                    if created:
-                        self.stdout.write(
-                            self.style.SUCCESS(
-                                f'Successfully created competitor "{competitor.firstname}"')
-                        )
-                    else:
-                        self.stdout.write(
-                            self.style.WARNING(
-                                f'Competitor "{competitor.firstname}" already exists')
-                        )
         except Exception as e:
             # If any error occurs, the transaction will be rolled back
             self.stdout.write(
