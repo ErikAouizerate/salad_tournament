@@ -11,22 +11,22 @@ class TournamentViewSet(viewsets.ModelViewSet):
     queryset = Tournament.objects.all()
     serializer_class = TournamentSerializer
 
+    def str_to_bool(self, value):
+        return value.lower() in ["true", "1", "yes", "on"] if value else False
+
     @action(detail=True, methods=['get'])
     def nextRound(self, request, pk=None):
         tournament = self.get_object()
         tournamentService = TournamentService(tournament)
-        if request.GET.get('toFinish'):
-            next_round = tournamentService.pairing()
-        else:
-            next_round = tournamentService.pairing()
+        next_round = tournamentService.pairing()
 
         pairingsSerialized = PairingsListSerializer(next_round['pairings'], many=True)
         benchSerialized = CompetitorSerializer(next_round['bench'], many=True)
 
-        if request.GET.get('random'):
-            tournamentService.play_random_games({"pairings": pairingsSerialized.data})
+        if self.str_to_bool(request.GET.get('random')):
+            tournamentService.play_random_games({"pairings": pairingsSerialized.data}, self.str_to_bool(request.GET.get('toFinish')))
 
-        return Response({"pairings": pairingsSerialized.data, "bench": benchSerialized.data})
+        return Response({"pairings": pairingsSerialized.data, "bench": benchSerialized.data, "missing_rounds": next_round["missing_rounds"]})
 
     @action(detail=True, methods=['post'])
     def saveRound(self, request, pk=None):
@@ -34,6 +34,16 @@ class TournamentViewSet(viewsets.ModelViewSet):
         tournamentService = TournamentService(tournament)
 
         body = json.loads(request.body.decode("utf-8"))
-        tournamentService.updateResults(body["round"]['results'])
+        tournamentService.updateResults(body["round"]['results'], body['toFinish'])
+        missing_rounds = tournamentService.get_missing_rounds()
 
-        return Response({"message": f"Custom action for tournament {tournament.id}"})
+        return Response({"missing_rounds": missing_rounds})
+
+    @action(detail=True, methods=['get'])
+    def missingRounds(self, request, pk=None):
+        tournament = self.get_object()
+        tournamentService = TournamentService(tournament)
+
+        missing_rounds = tournamentService.get_missing_rounds()
+
+        return Response({"missing_rounds": missing_rounds})

@@ -7,7 +7,6 @@ class CompetitorSerializer(serializers.ModelSerializer):
         model = Competitor
         fields = "__all__"
 
-
 # class TeamSerializer(serializers.Serializer):
 #     """Custom serializer for team data"""
 #     # We don't define fields here because we'll handle the data manually

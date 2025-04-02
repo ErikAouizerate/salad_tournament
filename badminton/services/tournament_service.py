@@ -1,6 +1,8 @@
 from badminton.models import Competitor, Partner
 import statistics
 import random
+import math
+from django.db.models import Max
 
 
 class TournamentService:
@@ -8,7 +10,7 @@ class TournamentService:
     def __init__(self, tournament):
         self.tournament = tournament
 
-    def updateResults(self, matchs):
+    def updateResults(self, matchs, toFinish):
         results = []
         for match in matchs:
             has_team_a_won = match['hasTeamAWon']
@@ -37,13 +39,16 @@ class TournamentService:
             partner.game_count += 1
             partner.save()
 
+        max_played = Competitor.objects.filter(tournament=self.tournament, is_playing=True).aggregate(Max('played'))['played__max']
+
         for result in results:
             competitor = Competitor.objects.get(pk=result["id"])
-            competitor.played += 1
-            competitor.won += 1 if result["has_won"] else 0
-            competitor.lost += 1 if not result["has_won"] else 0
+            if not toFinish or competitor.played < max_played:
+                competitor.played += 1
+                competitor.won += 1 if result["has_won"] else 0
+                competitor.lost += 1 if not result["has_won"] else 0
 
-            competitor.save()
+                competitor.save()
         return results
 
     def pairing(self):
@@ -58,8 +63,6 @@ class TournamentService:
         players_pk = list(map(lambda x: x.pk, competitors))
 
         bench = list(Competitor.objects.exclude(pk__in=players_pk))
-
-        # print("not sorted", list(map(lambda x: x.pk, competitors)))
 
         # competitors = sorted(competitors, key=lambda x: players_order.index(x.pk) if x.pk in players_order else len(players_order))
         # print("playersplayersplayers", list(map(lambda x: x.pk, competitors)))
@@ -103,13 +106,43 @@ class TournamentService:
             pairings.append({'teamA': sorted_pairing[index], 'teamB': sorted_pairing[index + 1]})
 
         # self.updateResults(json.loads(json.dumps(pairings, cls=ModelEncoder)))
+        missing_rounds = self.get_missing_next_rounds(pairings)
 
-        return {"pairings": pairings, "bench": bench}
+        return {"pairings": pairings, "bench": bench, "missing_rounds": missing_rounds}
 
-    def play_random_games(self, matchup):
-        print("ppapapa", matchup)
+    def get_missing_next_rounds(self, pairings):
+        pairings_ids = []
+        for pairing in pairings:
+            pairings_ids.append(pairing["teamA"]['a'].id)
+            pairings_ids.append(pairing["teamA"]['b'].id)
+            pairings_ids.append(pairing["teamB"]['a'].id)
+            pairings_ids.append(pairing["teamB"]['b'].id)
+
+        all_competitors = list(Competitor.objects.filter(tournament=self.tournament).filter(is_playing=True))
+        max_played_games = 0
+        for competitor in all_competitors:
+            if competitor.id in pairings_ids:
+                competitor.played += 1
+            if competitor.played > max_played_games:
+                max_played_games = competitor.played
+
+        return self.__missing_rounds(all_competitors, max_played_games)
+
+    def get_missing_rounds(self):
+        max_played = Competitor.objects.filter(tournament=self.tournament, is_playing=True).aggregate(Max('played'))['played__max']
+        all_competitors = list(Competitor.objects.filter(tournament=self.tournament).filter(is_playing=True))
+        return self.__missing_rounds(all_competitors, max_played)
+
+    def __missing_rounds(self, all_competitors, max_played):
+        competitors_need_play = 0
+        for competitor in all_competitors:
+            if competitor.played < max_played:
+                competitors_need_play += 1
+
+        return math.ceil(competitors_need_play / (self.tournament.ground_count * 4))
+
+    def play_random_games(self, matchup, toFinish):
         for match in matchup['pairings']:
             match['hasTeamAWon'] = bool(random.getrandbits(1))
-        print("AFTER", matchup)
 
-        self.updateResults(matchup['pairings'])
+        self.updateResults(matchup['pairings'], toFinish)

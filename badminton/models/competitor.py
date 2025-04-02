@@ -20,7 +20,7 @@ class Competitor(Player):
         return self.level + won_ratio - lost_ratio
 
     def __str__(self):
-        return f"{self.firstname} {self.lastname}"
+        return f"({self.id}) {self.firstname} {self.lastname}, played: {self.played}"
 
     def save(self, *args, **kwargs):
         is_competitor = self.__class__ is Competitor
