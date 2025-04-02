@@ -3,8 +3,8 @@ from .player import Player
 from .partner import Partner
 
 
-class Competitor(Player):
-
+class Competitor(models.Model):
+    player = models.OneToOneField(Player, on_delete=models.CASCADE)
     tournament = models.ForeignKey('badminton.Tournament', blank=True, on_delete=models.CASCADE)
     won = models.IntegerField(default=0)
     lost = models.IntegerField(default=0)
@@ -14,25 +14,25 @@ class Competitor(Player):
 
     def calculate_rank(self):
         if self.played == 0:
-            return self.level
+            return self.player.level
         won_ratio = self.won / self.played
         lost_ratio = self.lost / self.played
-        return self.level + won_ratio - lost_ratio
+        return self.player.level + won_ratio - lost_ratio
 
     def __str__(self):
-        return f"({self.id}) {self.firstname} {self.lastname}, played: {self.played}"
+        if self.player:
+            return f"({self.id}) {self.player.firstname} {self.player.lastname}, played: {self.played}"
+        return f"({self.id}) Unknown Player, played: {self.played}"
 
     def save(self, *args, **kwargs):
-        is_competitor = self.__class__ is Competitor
-
         is_new = self.pk is None
-        if is_new and is_competitor:
+        if is_new:
             competitors = list(Competitor.objects.filter(tournament=self.tournament))
 
         self.rank = self.calculate_rank()
         super().save(*args, **kwargs)
 
-        if is_new and is_competitor:
+        if is_new:
             for competitor in competitors:
                 if competitor.id < self.id:
                     partner = Partner.objects.create(a=competitor, b=self, tournament=self.tournament)
@@ -43,4 +43,3 @@ class Competitor(Player):
 
     class Meta:
         app_label = 'badminton'
-        abstract = False

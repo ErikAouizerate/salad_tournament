@@ -9,7 +9,7 @@ class Partner(models.Model):
     game_count = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"{self.a.firstname} - {self.b.firstname} - {self.game_count}"
+        return f"{self.a.player.firstname} - {self.b.player.firstname} - {self.game_count}"
 
     class Meta:
         app_label = 'badminton'

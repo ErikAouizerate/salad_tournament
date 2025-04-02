@@ -29,17 +29,16 @@ class Command(BaseCommand):
                 for player_data in players_data:
                     player, created = Player.objects.get_or_create(
                         firstname=player_data['firstname'],
-                        defaults=player_data
+                        lastname=player_data['lastname'],
+                        defaults={'level': player_data['level'], 'gender': player_data['gender']}
                     )
                     if created:
                         self.stdout.write(
-                            self.style.SUCCESS(
-                                f'Successfully created player "{player.firstname}"')
+                            self.style.SUCCESS(f'Successfully created player "{player.firstname}"')
                         )
                     else:
                         self.stdout.write(
-                            self.style.WARNING(
-                                f'Player "{player.firstname}" already exists')
+                            self.style.WARNING(f'Player "{player.firstname}" already exists')
                         )
 
                 competitors_data = [
@@ -154,36 +153,35 @@ class Command(BaseCommand):
                     competitors_data[index]["firstname"] += f" {index}"
 
                 for competitor_data in competitors_data:
+                    player, created = Player.objects.get_or_create(
+                        firstname=competitor_data['firstname'],
+                        lastname=competitor_data['lastname'],
+                        defaults={'level': competitor_data['level'], 'gender': competitor_data['gender']}
+                    )
+                    if created:
+                        self.stdout.write(
+                            self.style.SUCCESS(f'Successfully created player "{player.firstname}"')
+                        )
+                    else:
+                        self.stdout.write(
+                            self.style.WARNING(f'Player "{player.firstname}" already exists')
+                        )
+
                     competitor, created = Competitor.objects.get_or_create(
-                        firstname=competitor_data["firstname"],
-                        defaults=competitor_data
+                        player=player,
+                        tournament=tournament,  # Ensure the tournament is passed
                     )
 
                     if created:
                         self.stdout.write(
                             self.style.SUCCESS(
-                                f'Successfully created competitor "{competitor.firstname}"')
+                                f'Successfully created competitor "{competitor.player.firstname}"')
                         )
                     else:
                         self.stdout.write(
                             self.style.WARNING(
-                                f'Competitor "{competitor.firstname}" already exists')
+                                f'Competitor "{competitor.player.firstname}" already exists')
                         )
-
-                players_data = [
-                    {
-                        'firstname': 'player z',
-                        'lastname': 'r',
-                        'level': 2,
-                        'gender': 'F'
-                    },
-                    {
-                        'firstname': 'player y',
-                        'lastname': 'r',
-                        'level': 4,
-                        'gender': 'F'
-                    },
-                ]
 
         except Exception as e:
             # If any error occurs, the transaction will be rolled back
