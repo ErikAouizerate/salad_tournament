@@ -86,18 +86,18 @@ class TournamentService:
         players_pk = [competitor.pk for competitor in competitors]
         partners = Partner.objects.filter(a__in=players_pk, b__in=players_pk).order_by('game_count')
 
-        for pair in partners:
-            pair.rank = players_dict[pair.a.pk].rank + players_dict[pair.b.pk].rank
+        for partner in partners:
+            partner.rank = players_dict[partner.a.pk].rank + players_dict[partner.b.pk].rank
 
-        sorted_pairs = sorted(partners, key=lambda e: (e.game_count, abs(average_rank * 2 - e.rank)))
+        sorted_partners = sorted(partners, key=lambda e: (e.game_count, abs(average_rank * 2 - e.rank)))
 
-        # print("sorted_pairs", sorted_pairs)
+        # print("sorted_partners", sorted_partners)
 
         pairing = []
 
         for _ in range(round(competitors.__len__() / 2)):
             player_A = competitors.pop()
-            pair = next(pair for pair in sorted_pairs if pair.a == player_A or pair.b == player_A)
+            pair = next(pair for pair in sorted_partners if pair.a == player_A or pair.b == player_A)
             if pair.a == player_A:
                 player_B = pair.b
             else:
@@ -107,7 +107,7 @@ class TournamentService:
 
             player_B = competitors.pop(player_B_index)
             pairing.append({"a": player_A, "b": player_B, "rank": player_A.rank + player_B.rank})
-            sorted_pairs = list(filter(lambda p: (p.a != player_A and p.b != player_A) and (p.a != player_B and p.b != player_B), sorted_pairs))
+            sorted_partners = list(filter(lambda p: (p.a != player_A and p.b != player_A) and (p.a != player_B and p.b != player_B), sorted_partners))
 
         sorted_pairing = sorted(pairing, key=lambda p: (p["rank"]))
 

@@ -16,8 +16,9 @@ class Competitor(models.Model):
     def calculate_rank(self):
         if self.played == 0:
             return self.player.level
-        won_ratio = self.won / self.played
-        lost_ratio = self.lost / self.played
+        real_played_match = self.won + self.lost
+        won_ratio = self.won / real_played_match
+        lost_ratio = self.lost / real_played_match
         return self.player.level + won_ratio - lost_ratio
 
     def __str__(self):
