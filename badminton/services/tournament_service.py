@@ -60,13 +60,11 @@ class TournamentService:
             Competitor.objects.filter(tournament=self.tournament)
             .filter(is_playing=True)
             .annotate(
-                # First create a random grouping
                 random_group=Window(
                     expression=RowNumber(),
                     order_by=Random()
                 )
             )
-            # Then order by 'played' within those random groups
             .order_by('played', 'random_group')
             [:self.tournament.ground_count * 4]
         )
@@ -78,7 +76,6 @@ class TournamentService:
 
         bench = list(Competitor.objects.exclude(pk__in=players_pk))
 
-        # competitors = sorted(competitors, key=lambda x: players_order.index(x.pk) if x.pk in players_order else len(players_order))
         # print("playersplayersplayers", list(map(lambda x: x.pk, competitors)))
 
         players_dict = {competitor.pk: competitor for competitor in competitors}
@@ -120,12 +117,11 @@ class TournamentService:
             pairings.append({'teamA': sorted_pairing[index], 'teamB': sorted_pairing[index + 1],
                             'rankDelta': sorted_pairing[index]["rank"] - sorted_pairing[index + 1]["rank"]})
 
-        # self.updateResults(json.loads(json.dumps(pairings, cls=ModelEncoder)))
-        missing_rounds = self.get_missing_next_rounds(pairings)
+        missing_rounds = self.__get_missing_next_rounds(pairings)
 
         return {"pairings": pairings, "bench": bench, "missing_rounds": missing_rounds}
 
-    def get_missing_next_rounds(self, pairings):
+    def __get_missing_next_rounds(self, pairings):
         pairings_ids = []
         for pairing in pairings:
             pairings_ids.append(pairing["teamA"]['a'].id)

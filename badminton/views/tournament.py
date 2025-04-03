@@ -26,7 +26,7 @@ class TournamentViewSet(viewsets.ModelViewSet):
         if self.str_to_bool(request.GET.get('random')):
             tournamentService.play_random_games({"pairings": pairingsSerialized.data}, self.str_to_bool(request.GET.get('toFinish')))
 
-        return Response({"pairings": pairingsSerialized.data, "bench": benchSerialized.data, "missing_rounds": next_round["missing_rounds"]})
+        return Response({"pairings": pairingsSerialized.data, "bench": benchSerialized.data, "missing_rounds_after_this_one": next_round["missing_rounds"]})
 
     @action(detail=True, methods=['post'])
     def saveRound(self, request, pk=None):
