@@ -1,5 +1,5 @@
 services:
-  web:
+  salad_backend_python:
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,15 +9,15 @@ services:
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=db
+      - DB_HOST=salad_backend_database
       - DB_PORT=5432
     volumes:
       - static_volume:/app/staticfiles
     networks:
-      - salad
+      - salad_backend
     depends_on:
-      - db
-  db:
+      - salad_backend_database
+  salad_backend_database:
     image: postgres:latest
     environment:
       POSTGRES_DB: ${DB_NAME}
@@ -28,17 +28,17 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - salad
+      - salad_backend
 
-  nginx:
+  salad_backend_nginx:
     image: nginx:alpine
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
       - static_volume:/home/app/web/static
     depends_on:
-      - web
+      - salad_backend_python
     networks:
-      - salad
+      - salad_backend
       - traefik-web
     labels:
       - "traefik.enable=true"
@@ -54,7 +54,7 @@ volumes:
   postgres_data:
 
 networks:
-  salad:
+  salad_backend:
     driver: bridge
   traefik-web:
     external: true
