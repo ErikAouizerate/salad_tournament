@@ -74,7 +74,7 @@ class TournamentService:
 
         players_pk = list(map(lambda x: x.pk, competitors))
 
-        bench = list(Competitor.objects.exclude(pk__in=players_pk))
+        bench = list(Competitor.objects.filter(tournament=self.tournament).exclude(pk__in=players_pk))
 
         # print("playersplayersplayers", list(map(lambda x: x.pk, competitors)))
 
