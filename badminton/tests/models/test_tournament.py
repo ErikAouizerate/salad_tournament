@@ -5,8 +5,8 @@ from django.db.utils import IntegrityError
 
 class TournamentTest(TestCase):
 
-    def create_tournament(self, name="t1"):
-        return Tournament.objects.create(name=name)
+    def create_tournament(self, name="t1", ground_count=0):
+        return Tournament.objects.create(name=name, ground_count=ground_count)
 
     def test_tournament_creation(self):
         t = self.create_tournament()

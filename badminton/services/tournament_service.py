@@ -52,10 +52,7 @@ class TournamentService:
                 competitor.save()
         return results
 
-    def pairing(self):
-
-        # players_order = []
-
+    def __get_competitors_short_list(self):
         competitors = list(
             Competitor.objects.filter(tournament=self.tournament)
             .filter(is_playing=True)
@@ -72,16 +69,16 @@ class TournamentService:
         if competitors.__len__() % 4 != 0:
             competitors = competitors[:-(competitors.__len__() % 4)]
 
-        players_pk = list(map(lambda x: x.pk, competitors))
+        return competitors
 
-        bench = list(Competitor.objects.filter(tournament=self.tournament).exclude(pk__in=players_pk))
+    def __get_bench(self, competitors):
+        players_pk = [competitor.pk for competitor in competitors]
 
-        # print("playersplayersplayers", list(map(lambda x: x.pk, competitors)))
+        return list(Competitor.objects.filter(tournament=self.tournament).exclude(pk__in=players_pk))
+
+    def __get_partners(self, competitors):
 
         players_dict = {competitor.pk: competitor for competitor in competitors}
-
-        average_rank = statistics.mean([competitor.rank for competitor in competitors])
-        # print("average_rank", average_rank)
 
         players_pk = [competitor.pk for competitor in competitors]
         partners = Partner.objects.filter(a__in=players_pk, b__in=players_pk).order_by('game_count')
@@ -89,15 +86,20 @@ class TournamentService:
         for partner in partners:
             partner.rank = players_dict[partner.a.pk].rank + players_dict[partner.b.pk].rank
 
-        sorted_partners = sorted(partners, key=lambda e: (e.game_count, abs(average_rank * 2 - e.rank)))
+        return partners
 
-        # print("sorted_partners", sorted_partners)
+    def __get_pairings(self, _competitors, _partners):
+        competitors = list(_competitors)
+        partners = list(_partners)
 
-        pairing = []
+        average_rank = statistics.mean([competitor.rank for competitor in competitors])
+        partners = sorted(partners, key=lambda e: (e.game_count, abs(average_rank * 2 - e.rank)))
+
+        pairings = []
 
         for _ in range(round(competitors.__len__() / 2)):
             player_A = competitors.pop()
-            pair = next(pair for pair in sorted_partners if pair.a == player_A or pair.b == player_A)
+            pair = next(pair for pair in partners if pair.a == player_A or pair.b == player_A)
             if pair.a == player_A:
                 player_B = pair.b
             else:
@@ -106,20 +108,40 @@ class TournamentService:
             player_B_index = competitors.index(player_B)
 
             player_B = competitors.pop(player_B_index)
-            pairing.append({"a": player_A, "b": player_B, "rank": player_A.rank + player_B.rank})
-            sorted_partners = list(filter(lambda p: (p.a != player_A and p.b != player_A) and (p.a != player_B and p.b != player_B), sorted_partners))
+            pairings.append({"a": player_A, "b": player_B, "rank": player_A.rank + player_B.rank})
+            partners = list(filter(lambda p: (p.a != player_A and p.b != player_A) and (p.a != player_B and p.b != player_B), partners))
 
-        sorted_pairing = sorted(pairing, key=lambda p: (p["rank"]))
+        return pairings
 
-        pairings = []
+    def __get_matchs(self, competitors):
 
-        for index in range(0, sorted_pairing.__len__(), 2):
-            pairings.append({'teamA': sorted_pairing[index], 'teamB': sorted_pairing[index + 1],
-                            'rankDelta': sorted_pairing[index]["rank"] - sorted_pairing[index + 1]["rank"]})
+        partners = self.__get_partners(competitors)
 
-        missing_rounds = self.__get_missing_next_rounds(pairings)
+        pairings = self.__get_pairings(competitors, partners)
 
-        return {"pairings": pairings, "bench": bench, "missing_rounds": missing_rounds}
+        pairings = sorted(pairings, key=lambda p: (p["rank"]))
+
+        matchs = []
+
+        for index in range(0, pairings.__len__(), 2):
+            matchs.append({'teamA': pairings[index], 'teamB': pairings[index + 1],
+                           'rankDelta': pairings[index]["rank"] - pairings[index + 1]["rank"]})
+        return matchs
+
+    def pairing(self):
+
+        competitors = self.__get_competitors_short_list()
+
+        bench = self.__get_bench(competitors)
+
+        if len(competitors) == 0:
+            matchs = []
+            missing_rounds = math.inf
+        else:
+            matchs = self.__get_matchs(competitors)
+            missing_rounds = self.__get_missing_next_rounds(matchs)
+
+        return {"pairings": matchs, "bench": bench, "missing_rounds_after_this_one": missing_rounds}
 
     def __get_missing_next_rounds(self, pairings):
         pairings_ids = []

@@ -6,11 +6,6 @@ from badminton.views import TournamentViewSet, CompetitorViewSet, PlayerViewSet
 
 app_name = 'badminton'
 
-# urlpatterns = [
-#     path('matchup/', MatchUpView.as_view(), name='matchup'),
-
-# ]
-
 router = DefaultRouter()
 router.register(r'tournaments', TournamentViewSet)
 router.register(r'players', PlayerViewSet)

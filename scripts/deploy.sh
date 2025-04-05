@@ -3,6 +3,6 @@
 # Download latest code
 git pull
 # Build new app image
-docker compose build web
+docker compose build salad_backend_python
 # Deploy new version
-docker rollout web
+docker rollout salad_backend_python
