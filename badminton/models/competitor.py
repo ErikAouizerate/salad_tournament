@@ -64,3 +64,8 @@ class Competitor(models.Model):
 
     class Meta:
         app_label = 'badminton'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['player', 'tournament'], name='unique_competitor_per_tournament'
+            )
+        ]
