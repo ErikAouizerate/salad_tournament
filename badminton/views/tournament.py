@@ -34,7 +34,7 @@ class TournamentViewSet(viewsets.ModelViewSet):
         tournamentService = TournamentService(tournament)
 
         body = json.loads(request.body.decode("utf-8"))
-        tournamentService.updateResults(body["round"]['results'], body['toFinish'])
+        tournamentService.updateResults(body['results'], body['toFinish'])
         missing_rounds = tournamentService.get_missing_rounds()
 
         return Response({"missing_rounds": missing_rounds})
