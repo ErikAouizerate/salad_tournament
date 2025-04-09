@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from badminton.models import Tournament
-from badminton.serializers import TournamentSerializer, PairingsListSerializer, CompetitorSerializer
+from badminton.serializers import TournamentSerializer, PairingsListSerializer, CompetitorDetailSerializer
 from rest_framework.decorators import action
 from badminton.services import TournamentService
 from rest_framework.response import Response
@@ -21,7 +21,7 @@ class TournamentViewSet(viewsets.ModelViewSet):
         next_round = tournamentService.pairing()
 
         pairingsSerialized = PairingsListSerializer(next_round['pairings'], many=True)
-        benchSerialized = CompetitorSerializer(next_round['bench'], many=True)
+        benchSerialized = CompetitorDetailSerializer(next_round['bench'], many=True)
 
         if self.str_to_bool(request.GET.get('random')):
             tournamentService.play_random_games({"pairings": pairingsSerialized.data}, self.str_to_bool(request.GET.get('toFinish')))

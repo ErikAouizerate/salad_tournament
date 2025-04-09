@@ -10,7 +10,7 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_HOST=salad_backend_database
-      - DB_PORT=5433
+      - DB_PORT=5432
     volumes:
       - static_volume:/app/staticfiles
     networks:

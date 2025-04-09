@@ -8,8 +8,15 @@ class PlayerSerializer(serializers.ModelSerializer):
         fields = ['id', 'firstname', 'lastname', 'level', 'gender']
 
 
-class CompetitorSerializer(serializers.ModelSerializer):
+class CompetitorDetailSerializer(serializers.ModelSerializer):
     player = PlayerSerializer(read_only=True)
+
+    class Meta:
+        model = Competitor
+        fields = "__all__"
+
+
+class CompetitorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Competitor
@@ -22,8 +29,8 @@ class CompetitorSerializer(serializers.ModelSerializer):
 
 class PairingSerializer(serializers.Serializer):
     """Custom serializer for a pairing of two teams"""
-    teamA = serializers.ListField(child=CompetitorSerializer(), required=False)
-    teamB = serializers.ListField(child=CompetitorSerializer(), required=False)
+    teamA = serializers.ListField(child=CompetitorDetailSerializer(), required=False)
+    teamB = serializers.ListField(child=CompetitorDetailSerializer(), required=False)
 
 
 class PairingsListSerializer(serializers.Serializer):
@@ -35,12 +42,12 @@ class PairingsListSerializer(serializers.Serializer):
 
         return {
             'teamA': [
-                CompetitorSerializer(instance['teamA']['a']).data,
-                CompetitorSerializer(instance['teamA']['b']).data
+                CompetitorDetailSerializer(instance['teamA']['a']).data,
+                CompetitorDetailSerializer(instance['teamA']['b']).data
             ],
             'teamB': [
-                CompetitorSerializer(instance['teamB']['a']).data,
-                CompetitorSerializer(instance['teamB']['b']).data
+                CompetitorDetailSerializer(instance['teamB']['a']).data,
+                CompetitorDetailSerializer(instance['teamB']['b']).data
             ],
             'rankDelta': instance["rankDelta"]
         }
